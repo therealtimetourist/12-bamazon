@@ -1,0 +1,14 @@
+create database
+create database user
+populate database tables
+
+create github repository
+clone github repository
+
+require mysql npm
+require inquirer npm
+
+bash: npm init (create package.json file)
+bash: npm install mysql --save
+bash: npm install inquirer --save
+
