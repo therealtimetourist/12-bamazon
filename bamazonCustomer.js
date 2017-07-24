@@ -111,7 +111,7 @@ function queryStock(){
 // prints the user order summary to the screen
 function orderSummary(quantity, product_name, price){
   console.log("===============================================================");
-  console.log(" Order placed successfully! Thank you for your order!");
+  console.log("Order placed successfully! Thank you for your order!");
   console.log("Product Name: " + product_name);
   console.log("Quantity: " + quantity);
   console.log("---------------------------------------------");

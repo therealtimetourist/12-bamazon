@@ -59,20 +59,121 @@ function start(){
 
 function viewInventory(){
   console.log("===============================================================");
-  console.log("View All Inventory:\n");
+  console.log("View All Products For Sale:\n");
 
+  dbconn.query("SELECT * FROM products", function(err, results) {
+    if (err) throw err;
+      // build table header
+      console.log("===============================================================");
+      console.log("ITEM ID  PRODUCT NAME \t QUANTITY \t PRICE");
+      console.log("===============================================================");
+      // loop through results/console.log results string
+      for (var i = 0; i < results.length; i++) {
+        var x = "  ";
+            x += results[i].item_ID + " \t ";
+            if(results[i].product_name.length < 6){ x += results[i].product_name + " \t\t "}else{ x += results[i].product_name + " \t "}
+            x += results[i].stock_quantity + " \t\t ";
+            x += results[i].price;
+        console.log(x);  
+      }
+    start();  
+  });
 }
 
 function viewLowInventory(){
   console.log("===============================================================");
   console.log("View Low Inventory:\n");
 
+  dbconn.query("SELECT * FROM products WHERE stock_quantity < 5", function(err, results) {
+    if (err) throw err;
+      // build table header
+      console.log("===============================================================");
+      console.log("ITEM ID  PRODUCT NAME \t QUANTITY \t PRICE");
+      console.log("===============================================================");
+      // loop through results/console.log results string
+      for (var i = 0; i < results.length; i++) {
+        var x = "  ";
+            x += results[i].item_ID + " \t ";
+            if(results[i].product_name.length < 6){ x += results[i].product_name + " \t\t "}else{ x += results[i].product_name + " \t "}
+            x += results[i].stock_quantity + " \t\t ";
+            x += results[i].price;
+        console.log(x);  
+      }
+    start();  
+  });
+
 }
 
 function addInventory(){
   console.log("===============================================================");
   console.log("Add To Current Inventory:\n");
-  
+  // query all items in the products table
+  dbconn.query("SELECT * FROM products", function(err, results) {
+      if (err) throw err;
+      // build table header
+      console.log("===============================================================");
+      console.log("ITEM ID  PRODUCT NAME \t QUANTITY \t PRICE");
+      console.log("===============================================================");
+      // loop through results/console.log results string
+      for (var i = 0; i < results.length; i++) {
+          var x = "  ";
+              x += results[i].item_ID + " \t ";
+              if(results[i].product_name.length < 6){ x += results[i].product_name + " \t\t "}else{ x += results[i].product_name + " \t "}
+              x += results[i].stock_quantity + " \t\t ";
+              x += results[i].price;
+          console.log(x);  
+        }
+      // prompt questions
+      inquirer.prompt([
+      {
+        name: "user_item_ID",
+        type: "input",
+        message: "Inventory Item To Update:",
+        validate: function(str) {
+          // error check to validate item ID is in range
+          if (str >= results[0].item_ID && str <= results[results.length-1].item_ID) {
+            item = str;
+            return true;
+          } else{
+            return "Please enter a valid item ID";
+          }
+        }
+      },
+      {
+        name: "user_quantity",
+        type: "input",
+        message: "How many do you wish to add to current inventory:",
+        // error check to validate enough items are in stock for the order
+        validate: function(value) {
+          if (isNaN(value) === false) {
+            return true;
+          } else{
+          return "Please enter a valid value for the number of items you wish to add to current inventory";
+        }
+       }
+     }
+    ]).then(function(answer) {
+      var upd_qty = parseInt(results[item-1].stock_quantity) + parseInt(answer.user_quantity);
+      dbconn.query(
+        "UPDATE products SET ? WHERE ?",
+        [
+          {
+            stock_quantity: upd_qty
+          },
+          {
+            item_id: answer.user_item_ID
+          }
+        ],
+        function(error) {
+          // if error, show error
+          if (error) throw err;
+          // else successful, run order summary and restart from beginning
+          console.log(answer.user_quantity + " " + results[item-1].product_name + " have been added to inventory.");
+          start();
+        }
+      );
+    });
+  });
 }
 
 function addNewProduct(){
@@ -88,12 +189,26 @@ function addNewProduct(){
     {
       name: "itemPrice",
       type: "input",
-      message: "Item Price: "
+      message: "Item Price: ",
+      validate: function(value) {
+        if (isNaN(value) === false) {
+          return true;
+        }else{
+        return "Please enter a valid item numerical price";
+        }
+      }
     },
     {
       name: "itemQuantity",
       type: "input",
-      message: "Initial Quantity: "
+      message: "Initial Quantity: ",
+      validate: function(value) {
+        if (isNaN(value) === false) {
+          return true;
+        }else{
+        return "Please enter a valid numerical initial qantity";
+      }
+    }
     },
     {
       name: "department",
