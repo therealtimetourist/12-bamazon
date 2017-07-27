@@ -1,6 +1,8 @@
 # bamazon
 UCF Coding Bootcamp command line MySQL assignment
 
+if you would like to recreate the sample database used in this project, use the bamazon.sql file in the workbench directory.
+
 This project has two parts: 
 
 a) node bamazonCustomer.js: The customer-facing UI for ordering products out of the database.
